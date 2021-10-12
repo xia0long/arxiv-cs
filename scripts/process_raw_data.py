@@ -24,6 +24,7 @@ for paper in tqdm(col_row_data.find()):
         "abstract": paper["abstract"],
         "authors": [" ".join(author[::-1]).strip() for author in paper["authors_parsed"]],
         "categories": categories,
+        "versions": paper["versions"],
         "update_date": paper["update_date"],
         "update_timestamp": time.mktime(datetime.datetime.strptime(paper["update_date"], "%Y-%m-%d").timetuple())
     }
