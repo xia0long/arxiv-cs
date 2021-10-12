@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<p><strong>Title:</strong>{{ paper.title }}</p>
+
+<p><strong>Abstract:</strong>{{ paper.abstract }}</p>
+<p><small>Authors: {{ paper.authors }}</small></p>
+<p><small>Update_date: {{ paper.update_date }}</small></p>
+
+<p><a href="https://arxiv.org/abs/{{ paper.id }}">Paper Link</a></p>
+
+{% endblock %}

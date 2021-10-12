@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<p><strong>Paper Count: {{ paper_count }}</strong></p>
+
+{% for paper_count in parper_counts_group_by_date %}
+<p><strong>{{ paper_count._id }}</strong></p>
+<p>{{ paper_count.count_by_day  }}</p>
+{% endfor %}
+
+{% endblock %}

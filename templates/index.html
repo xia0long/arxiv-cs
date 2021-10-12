@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for paper in papers %}
+<p><strong><a href="http://127.0.0.1:5000/paper/{{ paper.id }}">{{ paper.title }}</a></strong></p>
+<p>{{ paper.abstract }}</p>
+<small>Authors: {{ paper.authors }}</small>
+{% endfor %}
+
+{% endblock %}
