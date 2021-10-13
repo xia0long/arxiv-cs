@@ -1,11 +1,14 @@
+import json
+
 from pymongo import MongoClient
 from flask import Flask, request, jsonify, render_template
 
 client = MongoClient("localhost:27017")
 db = client.arxiv
 col_papers = db.papers
+N = col_papers.count()
 
-API_ENDPOINT = '/api/v0.1'
+search_dict = json.load(open("data/search.json", "r"))
 
 app = Flask(__name__)
 
@@ -22,6 +25,26 @@ def paper(id):
     paper.pop("_id")
 
     return render_template("paper.html", paper=paper)
+
+@app.route("/search/<qraw>")
+def search(qraw):
+    qparts = qraw.lower().strip().split()
+    # accumulate scores
+    scores = []
+    for paper_id, sd in search_dict.items():
+        score = sum(sd.get(q, 0) for q in qparts)
+        if score == 0:
+            continue
+        scores.append((score, paper_id))
+
+    scores.sort(reverse=True, key=lambda x: x[0])  # descending
+    papers = []
+    for s in scores[:10]:
+        paper = col_papers.find_one({"id": s[1]})
+        paper.pop("_id")
+        papers.append(paper)
+
+    return render_template("search.html", papers=papers)
 
 
 @app.route("/statistics")

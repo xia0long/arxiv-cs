@@ -19,7 +19,6 @@ col_papers = db.papers
 paper_total = col_papers.count()
 pdf_count = len(glob(os.path.join(PDF_PATH, "*/*.pdf")))
 
-
 for paper in col_papers.find():
     ym = paper["id"].split(".")[0]
     ym_path = os.path.join(PDF_PATH, ym)
