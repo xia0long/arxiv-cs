@@ -31,6 +31,9 @@ for paper in col_papers.find():
         continue
 
     paper_path = "gs://arxiv-dataset/arxiv/arxiv/pdf/{}/{}".format(ym, latest_pdf)
-    subprocess.run(["gsutil", "cp", paper_path, ym_path])
+    try:
+        subprocess.run(["gsutil", "cp", paper_path, ym_path])
+    except Exception as e:
+        continue
     pdf_count = pdf_count + 1
     print("{}/{}".format(pdf_count, paper_total))

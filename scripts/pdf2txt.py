@@ -4,6 +4,7 @@ sys.path.append("..")
 from glob import glob
 import subprocess
 
+from tqdm import tqdm
 from pymongo import MongoClient
 
 from config import DATA_PATH
@@ -22,7 +23,7 @@ txt_count = len(glob(os.path.join(TXT_PATH, "*/*.txt")))
 PDF_PATH = os.path.join(DATA_PATH, "pdf")
 pdf_path_list = glob(os.path.join(PDF_PATH, "*/*.pdf"))
 
-for pdf_path in pdf_path_list:
+for pdf_path in tqdm(pdf_path_list):
     
     ym = pdf_path.split("/")[-2]
     ym_path = os.path.join(TXT_PATH, ym)
@@ -35,4 +36,3 @@ for pdf_path in pdf_path_list:
         continue
     
     subprocess.run(["pdftotext", pdf_path, txt_path])
-
