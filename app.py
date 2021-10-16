@@ -14,9 +14,11 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    papers = col_papers.aggregate([{"$unset": ["_id"] }, {"$sample": {"size": 5}}])
+    papers = col_papers.aggregate([
+            {"$match": {"citations": {"$exists": "true"}}},
+            {"$sample": {"size": 5}}
+        ])
     papers = [paper for paper in papers]
-
     return render_template("index.html", papers=papers)
 
 @app.route("/paper/<id>")
