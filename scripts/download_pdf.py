@@ -40,7 +40,7 @@ def download_pdf(paper):
         r = subprocess.run(["gsutil", "cp", paper_path, ym_path], capture_output=True)
 
         if "No URLs matched" in r.stderr.decode():
-            print("Download fails, download the previous version.")
+            print("Download {} fails, download the previous version.".format(pdf))
             continue
         elif "Operation completed over" in r.stderr.decode():
             print("Download {} successful.".format(pdf))
@@ -50,8 +50,13 @@ def download_pdf(paper):
         else:
             print(r.stderr)
 
-
-for paper in col_papers.find().skip(9000):
-    
-    download_pdf(paper)
+if __name__ == "__main__":
+    import time
+    while 1:
+        try:
+            for paper in col_papers.find().skip(100000):
+                download_pdf(paper)
+        except:
+            time.sleep(5)
+            continue
     
