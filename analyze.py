@@ -69,7 +69,6 @@ def merge_dicts(dlist):
 
 search_dict = {}
 for paper in tqdm(col_papers.find()):
-
     dict_title = makedict(paper["title"], forceidf=10, scale=3)
     dict_authors = makedict(" ".join(paper["authors"]), forceidf=5)
     dict_abstract = makedict(paper["abstract"])

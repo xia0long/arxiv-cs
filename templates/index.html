@@ -2,10 +2,10 @@
 
 {% block content %}
 
-{% for paper in papers %}
-<p><strong><a href="http://127.0.0.1:5000/paper/{{ paper.id }}">{{ paper.title }}</a></strong></p>
-<p>{{ paper.abstract }}</p>
-<small>Authors: {{ paper.authors }}</small>
-{% endfor %}
+<form action="{{ url_for('search') }}" method="post">
+    <input type="text" name="input" placeholder="Search" autofocus>
+        <button type="submit">Search</button>
+    </div>
+</form>
 
 {% endblock %}

@@ -2,18 +2,17 @@
 
 {% block content %}
 
-<p><strong>Title:</strong>{{ paper.title }}</p>
-
-<p><strong>Abstract:</strong>{{ paper.abstract }}</p>
-<p><small>Authors: {{ paper.authors }}</small></p>
-<p><small>Update_date: {{ paper.update_date }}</small></p>
-
-<p><a href="https://arxiv.org/abs/{{ paper.id }}">Paper Link</a></p>
-
+<div class="list">
+    <p><strong><a href="https://arxiv.org/pdf/{{ paper.id }}">{{ paper.title }}</a></strong></p>
+    <p>{{ paper.abstract }}</p>
+    <p><small>Authors: {{ paper.authors|join(', ') }}</small></p>
+    <p><small>Update Date: {{ paper.update_date }}</small></p>
+</div>
 
 <h4>Inner Citations</h4>
 {% for citation in paper.citations  %}
- <p><a href="http://127.0.0.1:5000/paper/{{ citation }}">Paper Link</a></p>
+
+<p><a href="http://127.0.0.1:5000/paper/{{ citation }}">Paper Link</a></p>
 
 {% endfor  %}
 

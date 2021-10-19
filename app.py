@@ -14,12 +14,17 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
+
+    return render_template("index.html")
+
+@app.route("/random")
+def random():
     papers = col_papers.aggregate([
-            {"$match": {"citations": {"$exists": "true"}}},
+            {"$unset": ["_id"] },
             {"$sample": {"size": 5}}
         ])
     papers = [paper for paper in papers]
-    return render_template("index.html", papers=papers)
+    return render_template("random.html", papers=papers)
 
 @app.route("/paper/<id>")
 def paper(id):
@@ -28,8 +33,12 @@ def paper(id):
 
     return render_template("paper.html", paper=paper)
 
-@app.route("/search/<qraw>")
-def search(qraw):
+@app.route("/search/", methods=["GET", "POST"])
+def search():
+    if request.method == 'POST':
+        qraw = request.form["input"]
+    elif request.method == 'GET':
+        qraw = request.args.get('query')
     qparts = qraw.lower().strip().split()
     # accumulate scores
     scores = []
