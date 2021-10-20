@@ -57,16 +57,11 @@ def search():
 
     return render_template("search.html", papers=papers)
 
-
 @app.route("/statistics")
 def statistics():
     paper_count = col_papers.find().count()
-    parper_counts_group_by_date = col_papers.aggregate(
-            [{"$group": {"_id": "$update_date", "count_by_day": {"$sum": 1}}}])
     
-    return render_template("statistics.html",
-                            paper_count=paper_count,
-                            parper_counts_group_by_date=parper_counts_group_by_date)
+    return render_template("statistics.html", paper_count=paper_count)
 
 if __name__ == "__main__":
 

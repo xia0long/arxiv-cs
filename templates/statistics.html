@@ -2,11 +2,12 @@
 
 {% block content %}
 
-<p><strong>Paper Count: {{ paper_count }}</strong></p>
+<p>{{ paper_count }} papers included.</p>
 
-{% for paper_count in parper_counts_group_by_date %}
-<p><strong>{{ paper_count._id }}</strong></p>
-<p>{{ paper_count.count_by_day  }}</p>
-{% endfor %}
+
+<img loading="lazy" src="{{ url_for('static', filename='images/paper_counts_by_year.png' ) }}" width="640">
+
+
+<img loading="lazy" src="{{ url_for('static', filename='images/paper_counts_by_month.png' ) }}" width="640">
 
 {% endblock %}
