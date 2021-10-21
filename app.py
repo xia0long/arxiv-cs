@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify, render_template
 client = MongoClient("localhost:27017")
 db = client.arxiv
 col_papers = db.papers
+col_authors = db.authors
 N = col_papers.count()
 
 search_dict = json.load(open("data/search.json", "r"))
@@ -32,6 +33,17 @@ def paper(id):
     paper.pop("_id")
 
     return render_template("paper.html", paper=paper)
+
+@app.route("/author/<id>")
+def author(id):
+    author = col_authors.find_one({"name": id})
+    papers = col_papers.aggregate([
+            {"$unset": ["_id"] },
+            {"$match": {"id": { "$in": author["papers"] }}}
+        ])
+    papers = [paper for paper in papers]
+
+    return render_template("author.html", papers=papers)
 
 @app.route("/search/", methods=["GET", "POST"])
 def search():
