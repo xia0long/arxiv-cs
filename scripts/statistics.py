@@ -1,9 +1,14 @@
+import os
 import sys
 sys.path.append("..")
 
 import matplotlib.pyplot as plt
 
 from config import col_papers
+
+STATS_IMAGES_PATH = os.path.join("..", "static/images/stats")
+if not os.path.exists(STATS_IMAGES_PATH):
+    os.makedirs(STATS_IMAGES_PATH)
 
 def paper_counts_by_year():
     data = col_papers.aggregate([
