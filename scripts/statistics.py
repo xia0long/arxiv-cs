@@ -21,8 +21,7 @@ def paper_counts_by_year():
     plt.xticks(x, x)
     plt.title("Paper Counts by Year")
     # plt.show()
-    plt.savefig("../static/images/paper_counts_by_year.png")
-
+    plt.savefig("../static/images/stats/paper_counts_by_year.png")
 
 def paper_counts_by_month():
     data = col_papers.aggregate([
@@ -40,7 +39,7 @@ def paper_counts_by_month():
     plt.xticks(x[::3], rotation='vertical', fontsize=5)
     plt.title("Paper Counts by Month")
     # plt.show()
-    plt.savefig("../static/images/paper_counts_by_month.png")
+    plt.savefig("../static/images/stats/paper_counts_by_month.png")
 
 def paper_counts_by_author(topn=20):
     data = col_papers.aggregate([
@@ -61,10 +60,32 @@ def paper_counts_by_author(topn=20):
     plt.title("Paper Counts by Author TOP20")
     plt.xticks(rotation=45, fontsize=6)
     # plt.show()
-    plt.savefig("../static/images/paper_counts_by_author_top20.png")
+    plt.savefig("../static/images/stats/paper_counts_by_author_top20.png")
+
+def paper_counts_by_categories():
+    data = col_papers.aggregate([
+            {"$unwind": "$categories"},
+            {"$group": {"_id": "$categories", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+        ])
+
+    x, y = [], []
+    for i in data:
+        if i["_id"].startswith("cs.") or i["_id"] == "stat.ML":
+            x.append(i["_id"])
+            y.append(i["count"])
+
+    plt.figure(figsize=(10,5))
+    plt.bar(x, y)
+    plt.xticks(x, x)
+    plt.title("Paper Counts by Categories")
+    plt.xticks(rotation=45, fontsize=6)
+    # plt.show()
+    plt.savefig("../static/images/stats/paper_counts_by_categories.png")
     
 if __name__ == "__main__":
 
     paper_counts_by_year()
     paper_counts_by_month()
     paper_counts_by_author()
+    paper_counts_by_categories()

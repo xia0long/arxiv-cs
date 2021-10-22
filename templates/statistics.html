@@ -4,10 +4,12 @@
 
 <p>{{ paper_count }} papers included.</p>
 
+<img loading="lazy" src="{{ url_for('static', filename='images/stats/paper_counts_by_year.png' ) }}" width="640">
 
-<img loading="lazy" src="{{ url_for('static', filename='images/paper_counts_by_year.png' ) }}" width="640">
+<img loading="lazy" src="{{ url_for('static', filename='images/stats/paper_counts_by_month.png' ) }}" width="640">
 
+<img loading="lazy" src="{{ url_for('static', filename='images/stats/paper_counts_by_categories.png' ) }}" width="640">
 
-<img loading="lazy" src="{{ url_for('static', filename='images/paper_counts_by_month.png' ) }}" width="640">
+<img loading="lazy" src="{{ url_for('static', filename='images/stats/paper_counts_by_author_top20.png' ) }}" width="640">
 
 {% endblock %}
