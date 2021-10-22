@@ -1,15 +1,12 @@
+import os
 import json
+from time import time
 
-from pymongo import MongoClient
 from flask import Flask, request, jsonify, render_template
 
-client = MongoClient("localhost:27017")
-db = client.arxiv
-col_papers = db.papers
-col_authors = db.authors
-N = col_papers.count()
+from config import col_papers, col_authors, DATA_PATH
 
-search_dict = json.load(open("data/search.json", "r"))
+search_dict = json.load(open(os.path.join(DATA_PATH, "search.json"), "r"))
 
 app = Flask(__name__)
 
@@ -71,9 +68,8 @@ def search():
 
 @app.route("/statistics")
 def statistics():
-    paper_count = col_papers.find().count()
     
-    return render_template("statistics.html", paper_count=paper_count)
+    return render_template("statistics.html", paper_count=col_papers.estimated_document_count())
 
 if __name__ == "__main__":
 

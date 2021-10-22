@@ -1,15 +1,12 @@
 import json
 import time
 import datetime
+import sys
+sys.path.append("..")
 
 from tqdm import tqdm
-from pymongo import MongoClient
 
-client = MongoClient("localhost:27017")
-db = client.arxiv
-col_raw_data = db.raw_data
-col_papers = db.papers
-col_authors = db.authors
+from config import DATA_PATH, col_raw_data, col_papers, col_authors
 
 # STEP 1: Insert raw data
 def insert_raw_data():

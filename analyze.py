@@ -1,16 +1,11 @@
 import json
 
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction import _stop_words
-from sklearn import svm
-
 from tqdm import tqdm
-from pymongo import MongoClient
+import numpy as np
+from sklearn.feature_extraction import _stop_words
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-client = MongoClient("localhost:27017")
-db = client.arxiv
-col_papers = db.papers
+from config import col_papers
 
 max_features = 5000
 v_abs = TfidfVectorizer(

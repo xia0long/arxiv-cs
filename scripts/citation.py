@@ -5,14 +5,9 @@ import re
 from glob import glob
 
 from tqdm import tqdm
-from pymongo import MongoClient
 
-from config import DATA_PATH
+from config import DATA_PATH, col_papers
 from regex_arxiv import REGEX_ARXIV_FLEXIBLE, clean
-
-client = MongoClient("localhost:27017")
-db = client.arxiv
-col_papers = db.papers
 
 TXT_PATH = os.path.join(DATA_PATH, "txt")
 RE_FLEX = re.compile(REGEX_ARXIV_FLEXIBLE)
