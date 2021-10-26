@@ -7,7 +7,7 @@
     <p>{{ paper.abstract }}</p>
     <p><small>Authors:
     {% for author in paper.authors %}
-        <a href="http://127.0.0.1:5000/author/{{ author }}">{{ author }}</a>
+        <a href="{{ url_for('author', id=author) }}">{{ author }}</a>
     {% endfor %}
     </small></p>
     <p><small>Update Date: {{ paper.update_date }}</small></p>
@@ -16,7 +16,7 @@
 <strong>Inner Citations</strong>
 {% for citation in paper.citations  %}
 
-<p><a href="http://127.0.0.1:5000/paper/{{ citation }}">Paper Link</a></p>
+    <a href="{{ url_for('paper', id=citation) }}">{{ author }}</a>
 
 {% endfor  %}
 

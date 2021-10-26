@@ -5,12 +5,12 @@
 {% for paper in papers %}
 
 <div class="list">
-    <p><strong><a href="http://127.0.0.1:5000/paper/{{ paper.id }}">{{ paper.title }}</a></strong></p>
+    <p><strong><a href="{{ url_for('paper', id=paper.id) }}">{{ paper.title }}</a></strong></p>
     <p>{{ paper.abstract }}</p>
     <!-- <p><small>Authors: {{ paper.authors|join(', ') }}</small></p> -->
     <p><small>Authors:
     {% for author in paper.authors %}
-    <a href="http://127.0.0.1:5000/author/{{ author }}">{{ author }}</a>
+    <a href="{{ url_for('author', id=author) }}">{{ author }}</a>
     {% endfor %}
     </small></p>
 </div>
