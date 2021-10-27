@@ -3,7 +3,6 @@ import sys
 sys.path.append("..")
 import json
 from glob import glob
-import subprocess
 
 from tqdm import tqdm
 
@@ -13,104 +12,93 @@ PDF_PATH = os.path.join(DATA_PATH, "pdf")
 if not os.path.exists(PDF_PATH):
     os.makedirs(PDF_PATH)
 
-paper_total = col_papers.estimated_document_count()
-pdf_count = len(glob(os.path.join(PDF_PATH, "*/*.pdf")))
+TXT_PATH = os.path.join(DATA_PATH, "txt")
+if not os.path.exists(TXT_PATH):
+    os.makedirs(TXT_PATH)
+
+REMOTE_PDF_PATH = json.load(open(os.path.join(DATA_PATH, "pdf_path_list2.json"), "r"))
 
 def get_pdf_list():
 
     D = {}
     paper_id_list = col_papers.find({}, {"_id": 0, "id": 1})
-    paper_id_list = [i["id"] for i in paper_id_list]
+    paper_id_list = set([i["id"] for i in paper_id_list])
 
-    with open(os.path.join(DATA_PATH, "arxiv-dataset_list-of-files.txt")) as f:
+    if os.path.isfile("/tmp/remote_pdf_path_list.txt"):
+        print("/tmp/remote_pdf_path_list.txt not exists, please run `get_remote_pdf_path.sh` first.")
+        return
+    with open("/tmp/remote_pdf_path_list.txt", "r") as f:
         for line in tqdm(f):
-            if not "arxiv/arxiv/pdf" in line:
-                continue
-            if not line.strip().endswith(".pdf"):
-                continue
-            pid = line.split("/")[-1].split("v")[0]
-            ym = line.split("/")[-2]
-            if not pid:
-                continue
+            if "arxiv/cs/pdf" in line:
+                pid = "cs/" + line.split("/")[-1].split("v")[0]
+            else:
+                pid = line.split("/")[-1].split("v")[0]
             
-            print(line)
-            print(D)
+            ym = line.split("/")[-2]
             if pid in paper_id_list:
                 if ym not in D.keys():
-                    D[ym] = {pid: [line.strip()]}
+                    D[ym] = {}
+                if pid not in D[ym].keys():
+                    D[ym][pid] = [line.strip()]
                 else:
-
                     D[ym][pid].append(line.strip())
 
     json.dump(D, open(os.path.join(DATA_PATH, "pdf_path_list.json"), "w"), indent=4)
 
+    D2 = {} # Compared to D1, only the latest version of the paper is kept
+    for ym, data in tqdm(D.items()):
+        if ym not in D2.keys():
+            D2[ym] = []
+        for pid, paper_path_list in data.items():
+            D2[ym].append(paper_path_list[-1])
 
-def download_pdf(paper):
-    """
-    If the downloads fails, then download the previous version.
-    """
-    global pdf_count
-    ym = paper["id"].split(".")[0]
-    ym_path = os.path.join(PDF_PATH, ym)
-    
-    for v in paper["versions"][::-1]:
+    json.dump(D2, open(os.path.join(DATA_PATH, "pdf_path_list2.json"), "w"), indent=4)
 
-        pdf = "{}{}.pdf".format(paper["id"], v["version"])
-        if not os.path.exists(ym_path):
-            os.makedirs(ym_path)
 
-        if os.path.isfile(os.path.join(ym_path, pdf)):
+def get_pdf_remote_address(paper_id):
+
+    pass
+
+def download_one(paper_id):
+
+    pass
+
+def download_by_month(ym):
+
+    local_dir = os.path.join(DATA_PATH, ym)
+    if not os.path.exists(local_dir):
+        os.makedirs(local_dir)
+
+    with open("/tmp/tmp.txt", "w") as f:
+        f.writelines("%s\n" % l for l in REMOTE_PDF_PATH[ym])
+
+    cmd = "cat {} | gsutil cp -I {}".format("/tmp/tmp.txt", local_dir)
+    os.system(cmd)
+
+def download_all():
+
+    for ym in tqdm(REMOTE_PDF_PATH.keys()):
+        if os.path.exists(os.path.join(DATA_PATH, ym)):
             continue
-
-        paper_path = "gs://arxiv-dataset/arxiv/arxiv/pdf/{}/{}".format(ym, pdf)
-        r = subprocess.run(["gsutil", "cp", paper_path, ym_path], capture_output=True)
-
-        if "No URLs matched" in r.stderr.decode():
-            print("Download {} fails, download the previous version.".format(pdf))
-            continue
-        elif "Operation completed over" in r.stderr.decode():
-            print("Download {} successful.".format(pdf))
-            pdf_count = pdf_count + 1
-            print("{}/{}".format(pdf_count, paper_total))
-            break
-        else:
-            print(r.stderr)
+        download_by_month(ym)
 
 def pdf2txt():
 
-    TXT_PATH = os.path.join(DATA_PATH, "txt")
-    if not os.path.exists(TXT_PATH):
-        os.makedirs(TXT_PATH)
-
-    txt_count = len(glob(os.path.join(TXT_PATH, "*/*.txt")))
-
-    PDF_PATH = os.path.join(DATA_PATH, "pdf")
     pdf_path_list = glob(os.path.join(PDF_PATH, "*/*.pdf"))
-
     for pdf_path in tqdm(pdf_path_list):
-        
-        ym = pdf_path.split("/")[-2]
+        ym = pdf_path.split("/")[-2]  # a string short for year and month, e.g. 2110(2021.10)
         ym_path = os.path.join(TXT_PATH, ym)
         
         if not os.path.exists(ym_path):
             os.makedirs(ym_path)
 
-        txt_path = pdf_path.replace("pdf", "txt", 1) + ".txt"
+        txt_path = pdf_path + ".txt"
         if os.path.isfile(txt_path):
             continue
         
-        subprocess.run(["pdftotext", pdf_path, txt_path])
-
-
+        os.system("pdftotext {} {}".format(pdf_path, txt_path))
 
 if __name__ == "__main__":
-    
-    # import time
-    # while 1:
-    #     try:
-    #         for paper in col_papers.find().skip(100000):
-    #             download_pdf(paper)
-    #     except:
-    #         time.sleep(5)
-    #         continue
+
     get_pdf_list()
+    download_all()
