@@ -24,7 +24,7 @@ def get_pdf_list():
     paper_id_list = col_papers.find({}, {"_id": 0, "id": 1})
     paper_id_list = set([i["id"] for i in paper_id_list])
 
-    if os.path.isfile("/tmp/remote_pdf_path_list.txt"):
+    if not os.path.isfile("/tmp/remote_pdf_path_list.txt"):
         print("/tmp/remote_pdf_path_list.txt not exists, please run `get_remote_pdf_path.sh` first.")
         return
     with open("/tmp/remote_pdf_path_list.txt", "r") as f:
@@ -61,7 +61,10 @@ def get_pdf_remote_address(paper_id):
 
 def download_one(paper_id):
 
-    pass
+    if "/" in paper_id:
+        ym = paper_id.split("/")[1][:4]
+    else:
+        pass
 
 def download_by_month(ym):
 
@@ -72,7 +75,7 @@ def download_by_month(ym):
     with open("/tmp/tmp.txt", "w") as f:
         f.writelines("%s\n" % l for l in REMOTE_PDF_PATH[ym])
 
-    cmd = "cat {} | gsutil cp -I {}".format("/tmp/tmp.txt", local_dir)
+    cmd = "cat {} | gsutil -m cp -I {}".format("/tmp/tmp.txt", local_dir)
     os.system(cmd)
 
 def download_all():
@@ -100,5 +103,5 @@ def pdf2txt():
 
 if __name__ == "__main__":
 
-    get_pdf_list()
+    # get_pdf_list()
     download_all()
