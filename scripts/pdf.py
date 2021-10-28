@@ -8,11 +8,11 @@ from tqdm import tqdm
 
 from config import DATA_PATH, col_papers
 
-PDF_PATH = os.path.join(DATA_PATH, "pdf")
+PDF_PATH = os.path.join(DATA_PATH, "cs", "pdf")
 if not os.path.exists(PDF_PATH):
     os.makedirs(PDF_PATH)
 
-TXT_PATH = os.path.join(DATA_PATH, "txt")
+TXT_PATH = os.path.join(DATA_PATH, "cs", "txt")
 if not os.path.exists(TXT_PATH):
     os.makedirs(TXT_PATH)
 
@@ -55,20 +55,46 @@ def get_pdf_list():
     json.dump(D2, open(os.path.join(DATA_PATH, "pdf_path_list2.json"), "w"), indent=4)
 
 
-def get_pdf_remote_address(paper_id):
+def parse_paper_id(paper_id):
+    
+    paper = col_papers.find_one({"id": paper_id})
+    cate = paper["categories"][0]
+    if "cs" in paper_id:
+        ym = paper_id.split("/")[1][:4]
+        index = paper_id.split("/")[1][4:]
+    else:
+        ym, index = paper_id.split(".")
 
-    pass
+    return cate, ym, index
+
+def get_pdf_remote_path(paper_id):
+
+    _, ym, index = parse_paper_id(paper_id)
+    for remote_pdf_path in REMOTE_PDF_PATH[ym]:
+        if "cs" in paper_id:
+            if ym+index in remote_pdf_path:
+                return remote_pdf_path
+        elif "." in paper_id:
+            if ".".join(ym, index) in remote_pdf_path:
+                return remote_pdf_path
+        else:
+            print("Wrong paper id: {}".format(paper_id))
 
 def download_one(paper_id):
 
-    if "/" in paper_id:
+    remote_path = get_pdf_remote_path(paper_id)
+    if "cs" in paper_id:
         ym = paper_id.split("/")[1][:4]
     else:
-        pass
+        ym = paper_id.split(".")[0]
+
+    local_dir = os.path.join(DATA_PATH, "cs", ym)
+    cmd = "gsutil cp {} {}".format(remote_path, local_dir)
+    os.system(cmd)
 
 def download_by_month(ym):
 
-    local_dir = os.path.join(DATA_PATH, ym)
+    local_dir = os.path.join(DATA_PATH, "cs", "pdf", ym)
     if not os.path.exists(local_dir):
         os.makedirs(local_dir)
 
@@ -95,7 +121,7 @@ def pdf2txt():
         if not os.path.exists(ym_path):
             os.makedirs(ym_path)
 
-        txt_path = pdf_path + ".txt"
+        txt_path = pdf_path.replace("pdf", "txt", 1) + ".txt"
         if os.path.isfile(txt_path):
             continue
         
@@ -103,5 +129,5 @@ def pdf2txt():
 
 if __name__ == "__main__":
 
-    # get_pdf_list()
+    get_pdf_list()
     download_all()

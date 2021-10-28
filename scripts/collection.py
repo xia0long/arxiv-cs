@@ -22,9 +22,11 @@ def build_collection_papers():
 
         categories = paper["categories"]
         categories = [c.strip() for c in categories.split()]
-        if not (any([c.startswith("cs.") for c in categories])==True or "stat.ML" in categories):
+        # if not (any([c.startswith("cs.") for c in categories])==True or "stat.ML" in categories):
+        #     continue
+        if not categories[0].startswith("cs"):
             continue
-
+        
         y, m, d = [int(i) for i in paper["update_date"].split("-")]
         p = {
             "id": paper["id"],
