@@ -1,3 +1,4 @@
+import os
 import json
 import time
 import datetime
@@ -10,7 +11,7 @@ from config import DATA_PATH, col_raw_data, col_papers, col_authors
 
 # STEP 1: Insert raw data
 def insert_raw_data():
-    with open('../data/arxiv-metadata-oai-snapshot.json') as f:
+    with open(os.path.join(DATA_PATH, 'arxiv-metadata-oai-snapshot.json')) as f:
         for line in tqdm(f):
             paper=json.loads(line)
             col_raw_data.insert_one(paper)
@@ -61,7 +62,7 @@ def build_collection_authors():
                 D[author].append(paper["id"])
 
     # import json
-    # json.dump(D, open("../data/author.json", "w"), indent=4)
+    # json.dump(D, open(os.path.join(DATA_PATH, "author.json"), "w"), indent=4)
 
     for author, paper_list in tqdm(D.items()):
         col_authors.insert_one({"name": author, "papers": paper_list})
