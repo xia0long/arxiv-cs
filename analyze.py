@@ -10,7 +10,7 @@ from config import col_papers, DATA_PATH
 
 max_features = 5000
 v_abs = TfidfVectorizer(
-    input="content", 
+    input="content",
     encoding="utf-8",
     decode_error="replace",
     strip_accents="unicode",
@@ -25,10 +25,10 @@ v_abs = TfidfVectorizer(
     smooth_idf=True,
     sublinear_tf=True,
     max_df=1.0,
-    min_df=1
+    min_df=1,
 )
 
-papers = col_papers.aggregate([{"$unset": ["_id"] }, {"$sample": {"size": 20000}}])
+papers = col_papers.aggregate([{"$unset": ["_id"]}, {"$sample": {"size": 20000}}])
 corpus_abs = [paper["abstract"] for paper in papers]
 v_abs.fit(corpus_abs)
 
@@ -36,14 +36,19 @@ vocab = v_abs.vocabulary_
 idf = v_abs.idf_
 
 english_stop_words = _stop_words.ENGLISH_STOP_WORDS
-punc = "'!\"#$%&\'()*+,./:;<=>?@[\\]^_`{|}~'" # removed hyphen from string.punctucation
+punc = "'!\"#$%&'()*+,./:;<=>?@[\\]^_`{|}~'"  # removed hyphen from string.punctucation
 trans_table = {ord(c): None for c in punc}
+
 
 def makedict(s, forceidf=None, scale=1.0):
     words = set(s.lower().translate(trans_table).strip().split())
     words = set(w for w in words if len(w) > 1 and (not w in english_stop_words))
     idfd = {}
-    for w in words:  # todo: if we're using bigrams in vocab then this won't search over them
+    for (
+        w
+    ) in (
+        words
+    ):  # todo: if we're using bigrams in vocab then this won't search over them
         if forceidf is None:
             if w in vocab:
                 idfval = idf[vocab[w]] * scale  # we have idf for this
@@ -52,16 +57,18 @@ def makedict(s, forceidf=None, scale=1.0):
         else:
             idfval = forceidf
         idfd[w] = idfval
-        
+
     return idfd
+
 
 def merge_dicts(dlist):
     m = {}
     for d in dlist:
-        for k,v in d.items():
+        for k, v in d.items():
             m[k] = m.get(k, 0) + v
-    
+
     return m
+
 
 search_dict = {}
 for paper in tqdm(col_papers.find()):

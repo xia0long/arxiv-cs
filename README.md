@@ -1,10 +1,10 @@
 # ARXIV | CS
 
-This project is used to exploring papers related computer science. Visit http://49.235.105.165:5000
+This project allows one exploring papers related to computer science. Visit http://49.235.105.165:5000
 
 ## Dataset
 
-All data from arxiv.org
+All data downloaded from arxiv.org.
 
 more info: https://arxiv.org/category_taxonomy
 

@@ -3,6 +3,7 @@ import json
 import time
 import datetime
 import sys
+
 sys.path.append("..")
 
 from tqdm import tqdm
@@ -11,10 +12,11 @@ from config import DATA_PATH, col_raw_data, col_papers, col_authors
 
 # STEP 1: Insert raw data
 def insert_raw_data():
-    with open(os.path.join(DATA_PATH, 'arxiv-metadata-oai-snapshot.json')) as f:
+    with open(os.path.join(DATA_PATH, "arxiv-metadata-oai-snapshot.json")) as f:
         for line in tqdm(f):
-            paper=json.loads(line)
+            paper = json.loads(line)
             col_raw_data.insert_one(paper)
+
 
 # STEP 2: Build collections
 def build_collection_papers():
@@ -27,19 +29,23 @@ def build_collection_papers():
         #     continue
         if not categories[0].startswith("cs"):
             continue
-        
+
         y, m, d = [int(i) for i in paper["update_date"].split("-")]
         p = {
             "id": paper["id"],
             "doi": paper["doi"],
             "title": paper["title"],
             "abstract": paper["abstract"],
-            "authors": [" ".join(author[::-1]).strip() for author in paper["authors_parsed"]],
+            "authors": [
+                " ".join(author[::-1]).strip() for author in paper["authors_parsed"]
+            ],
             "categories": categories,
             "versions": paper["versions"],
             "update_date": paper["update_date"],
             "update_date_dict": {"year": y, "month": m, "day": d},
-            "update_timestamp": time.mktime(datetime.datetime.strptime(paper["update_date"], "%Y-%m-%d").timetuple())
+            "update_timestamp": time.mktime(
+                datetime.datetime.strptime(paper["update_date"], "%Y-%m-%d").timetuple()
+            ),
         }
 
         # col_papers.update({"id": paper["id"]}, p, upsert=True)  # too slow
@@ -69,8 +75,9 @@ def build_collection_authors():
 
     col_authors.create_index("name")
 
+
 if __name__ == "__main__":
-    
+
     insert_raw_data()
     build_collection_papers()
     build_collection_authors()

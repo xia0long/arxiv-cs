@@ -1,5 +1,6 @@
 import os
 import sys
+
 sys.path.append("..")
 import re
 from glob import glob
@@ -15,6 +16,7 @@ RE_FLEX = re.compile(REGEX_ARXIV_FLEXIBLE)
 paper_id_list = col_papers.find({}, {"_id": 0, "id": 1})
 paper_id_list = set([i["id"] for i in paper_id_list])
 
+
 def extract_references(filename, pattern=RE_FLEX):
 
     out = []
@@ -22,10 +24,11 @@ def extract_references(filename, pattern=RE_FLEX):
         txt = f.read()
         for matches in pattern.findall(txt):
             out.extend([clean(a) for a in matches if a])
-    
+
     out = [i for i in set(out) if i in paper_id_list]
 
     return out
+
 
 def update_references():
     paper_txt_path_list = glob(os.path.join(TXT_PATH, "*/*.txt"))
@@ -36,19 +39,19 @@ def update_references():
             references.remove(paper_id)
         if not references:
             continue
-    
+
         print(paper_id, references)
-    
+
         col_papers.update_one({"id": paper_id}, {"$set": {"references": references}})
 
 
 def update_citations():
-    
+
     D = {}
     for paper in tqdm(col_papers.find()):
         if "references" not in paper.keys():
             continue
-        
+
         for reference in paper["references"]:
             if reference not in D.keys():
                 D[reference] = [paper["id"]]
@@ -60,6 +63,7 @@ def update_citations():
     for paper_id, citations in tqdm(D.items()):
 
         col_papers.update_one({"id": paper_id}, {"$set": {"citations": citations}})
+
 
 if __name__ == "__main__":
 

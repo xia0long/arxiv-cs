@@ -10,29 +10,28 @@ search_dict = json.load(open(os.path.join(DATA_PATH, "search.json"), "r"))
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def index():
 
     return render_template("index.html")
 
+
 @app.route("/random")
 def random():
-    papers = col_papers.aggregate([
-            {"$unset": ["_id"] },
-            {"$sample": {"size": 5}}
-        ])
+    papers = col_papers.aggregate([{"$unset": ["_id"]}, {"$sample": {"size": 5}}])
     papers = [paper for paper in papers]
     return render_template("paper_list.html", papers=papers)
 
+
 @app.route("/recent")
 def recent():
-    papers = col_papers.aggregate([
-            {"$unset": ["_id"] },
-            {"$sort": {"update_timestamp": -1}},
-            {"$limit": 10}
-        ])
+    papers = col_papers.aggregate(
+        [{"$unset": ["_id"]}, {"$sort": {"update_timestamp": -1}}, {"$limit": 10}]
+    )
     papers = [paper for paper in papers]
     return render_template("paper_list.html", papers=papers)
+
 
 @app.route("/paper/<id>")
 def paper(id):
@@ -41,23 +40,24 @@ def paper(id):
 
     return render_template("paper.html", paper=paper)
 
+
 @app.route("/author/<id>")
 def author(id):
     author = col_authors.find_one({"name": id})
-    papers = col_papers.aggregate([
-            {"$unset": ["_id"] },
-            {"$match": {"id": { "$in": author["papers"] }}}
-        ])
+    papers = col_papers.aggregate(
+        [{"$unset": ["_id"]}, {"$match": {"id": {"$in": author["papers"]}}}]
+    )
     papers = [paper for paper in papers]
 
     return render_template("author.html", papers=papers)
 
+
 @app.route("/search/", methods=["GET", "POST"])
 def search():
-    if request.method == 'POST':
+    if request.method == "POST":
         qraw = request.form["input"]
-    elif request.method == 'GET':
-        qraw = request.args.get('query')
+    elif request.method == "GET":
+        qraw = request.args.get("query")
     qparts = qraw.lower().strip().split()
     # accumulate scores
     scores = []
@@ -76,11 +76,15 @@ def search():
 
     return render_template("paper_list.html", papers=papers)
 
+
 @app.route("/statistics")
 def statistics():
-    
-    return render_template("statistics.html", paper_count=col_papers.estimated_document_count())
+
+    return render_template(
+        "statistics.html", paper_count=col_papers.estimated_document_count()
+    )
+
 
 if __name__ == "__main__":
 
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host="0.0.0.0", debug=True)
