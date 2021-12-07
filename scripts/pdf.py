@@ -107,7 +107,7 @@ def download_by_month(ym):
 def download_all():
 
     for ym in tqdm(REMOTE_PDF_PATH.keys()):
-        if os.path.exists(os.path.join(DATA_PATH, ym)):
+        if os.path.exists(os.path.join(DATA_PATH, "cs", "pdf", ym)):
             continue
         download_by_month(ym)
 
@@ -129,5 +129,6 @@ def pdf2txt():
 
 if __name__ == "__main__":
 
-    get_pdf_list()
-    download_all()
+    # get_pdf_list()
+    # download_all()
+    pdf2txt()

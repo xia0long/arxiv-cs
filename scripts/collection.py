@@ -39,7 +39,7 @@ def build_collection_papers():
             "versions": paper["versions"],
             "update_date": paper["update_date"],
             "update_date_dict": {"year": y, "month": m, "day": d},
-            # "update_timestamp": time.mktime(datetime.datetime.strptime(paper["update_date"], "%Y-%m-%d").timetuple())
+            "update_timestamp": time.mktime(datetime.datetime.strptime(paper["update_date"], "%Y-%m-%d").timetuple())
         }
 
         # col_papers.update({"id": paper["id"]}, p, upsert=True)  # too slow
@@ -71,6 +71,6 @@ def build_collection_authors():
 
 if __name__ == "__main__":
     
-    # insert_raw_data()
-    # build_collection_papers()
+    insert_raw_data()
+    build_collection_papers()
     build_collection_authors()

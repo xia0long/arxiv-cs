@@ -22,7 +22,17 @@ def random():
             {"$sample": {"size": 5}}
         ])
     papers = [paper for paper in papers]
-    return render_template("random.html", papers=papers)
+    return render_template("paper_list.html", papers=papers)
+
+@app.route("/recent")
+def recent():
+    papers = col_papers.aggregate([
+            {"$unset": ["_id"] },
+            {"$sort": {"update_timestamp": -1}},
+            {"$limit": 10}
+        ])
+    papers = [paper for paper in papers]
+    return render_template("paper_list.html", papers=papers)
 
 @app.route("/paper/<id>")
 def paper(id):
@@ -64,7 +74,7 @@ def search():
         paper.pop("_id")
         papers.append(paper)
 
-    return render_template("search.html", papers=papers)
+    return render_template("paper_list.html", papers=papers)
 
 @app.route("/statistics")
 def statistics():

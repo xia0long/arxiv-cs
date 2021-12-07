@@ -1,3 +1,4 @@
+import os
 import json
 
 from tqdm import tqdm
@@ -5,7 +6,7 @@ import numpy as np
 from sklearn.feature_extraction import _stop_words
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from config import col_papers
+from config import col_papers, DATA_PATH
 
 max_features = 5000
 v_abs = TfidfVectorizer(
@@ -71,4 +72,4 @@ for paper in tqdm(col_papers.find()):
 
     search_dict[paper["id"]] = q_dict
 
-json.dump(search_dict, open("data/search.json", "w"))
+json.dump(search_dict, open(os.path.join(DATA_PATH, "search.json"), "w"))
